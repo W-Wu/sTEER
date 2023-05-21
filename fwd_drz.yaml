@@ -1,0 +1,64 @@
+
+seed: 929
+__set_seed: !apply:torch.manual_seed [!ref <seed>]
+
+iemocap_root: IEMOCAP
+scp_folder: data/
+output_folder: exp-eval
+save_folder: !ref <output_folder>/save
+device: 'cuda:0'
+
+test_id: 5
+
+load_ckpt_folder: exp/save
+AVERAGE_CKPT: True
+
+embedding_dir: !ref <save_folder>/emb
+ref_rttm_dir:  !ref <scp_folder>/ref_rttms/
+sys_rttm_dir: !ref <save_folder>/sys_rttms
+der_dir: !ref <save_folder>/DER
+
+emb_dim: 512
+batch_size: 1
+max_num_spkrs: 2
+pval: 0.1
+ignore_overlap: False
+forgiveness_collar: 0.25
+
+sampling_rate: 16000
+
+dataloader_opts:
+    batch_size: !ref <batch_size>
+
+wav2vec2: !new:speechbrain.lobes.models.huggingface_wav2vec.HuggingFaceWav2Vec2
+   source: microsoft/wavlm-base-plus
+   output_norm: True
+   freeze: True
+   freeze_feature_extractor: True
+   output_all_hiddens: True
+   save_path: data/wav2vec2_checkpoint
+
+interface: !new:model.interface
+   num_pretrain_layers: 13
+
+embedding_model: !new:model.XVector
+    input_dim: 768
+    xvector_output_dim: 512
+    tdnn_dim: [512, 512, 512, 512, 1500]
+    tdnn_kernel: [5, 3, 3, 1, 1]
+    tdnn_dilation: [1, 2, 3, 1, 1]
+
+modules:
+    wav2vec2: !ref <wav2vec2>
+    interface: !ref <interface>
+    embedding_model: !ref <embedding_model>
+
+multimic_beamformer: !new:speechbrain.lobes.beamform_multimic.DelaySum_Beamformer
+    sampling_rate: !ref <sampling_rate>
+
+checkpointer: !new:speechbrain.utils.checkpoints.Checkpointer
+    checkpoints_dir: !ref <load_ckpt_folder>
+    recoverables:
+        wav2vec2: !ref <wav2vec2>
+        interface_SV: !ref <interface>
+        embedding_model_SV: !ref <embedding_model>
