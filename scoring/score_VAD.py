@@ -1,3 +1,4 @@
+# Compute MSR and FAR for VAD
 import numpy as np
 from pyannote.core import Annotation, Segment
 import json
