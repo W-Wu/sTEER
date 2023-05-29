@@ -1,3 +1,4 @@
+# Compute TEER and sTEER score
 import sys
 sys.path.append('../')
 from utils import *
