@@ -60,4 +60,11 @@ See https://pytorch.org/docs/1.11/generated/torch.nn.functional.ctc_loss.html fo
 
 ##
 Please cite:  
->
+> @inproceedings{wu23_interspeech,  
+  author={Wen Wu and Chao Zhang and Philip C. Woodland},  
+  title={{Integrating Emotion Recognition with Speech Recognition and Speaker Diarisation for Conversations}},  
+  year=2023,  
+  booktitle={Proc. INTERSPEECH 2023},  
+  pages={3607--3611},  
+  doi={10.21437/Interspeech.2023-293}  
+}   
