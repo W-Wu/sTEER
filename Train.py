@@ -17,6 +17,7 @@ import numpy as np
 import speechbrain as sb
 from hyperpyyaml import load_hyperpyyaml
 from transformers import WavLMForXVector
+from speechbrain.dataio.dataio import length_to_mask
 
 from utils import *
 
@@ -159,7 +160,8 @@ class MTL_Brain(sb.Brain):
             )
 
         # ER_head
-        pred_ER = self.modules.enc_ER(feats_ER)
+        src_key_padding_mask = self.make_masks(feats_ER,wav_len=wav_lens)
+        pred_ER = self.modules.enc_ER(feats_ER,src_key_padding_mask=~src_key_padding_mask)
 
         if self.FWD_DRZ:
             return pred_ER,p_ctc, p_tokens,wav_lens
@@ -174,6 +176,13 @@ class MTL_Brain(sb.Brain):
 
         return pred_ER,p_ctc, p_tokens,output_spk,wav_lens,pred_VAD
 
+    def make_masks(self, src, wav_len=None, pad_idx=0):
+        src_key_padding_mask = None
+        if wav_len is not None:
+            abs_len = torch.round(wav_len * src.shape[1])
+            src_key_padding_mask = length_to_mask(abs_len).bool()
+        return src_key_padding_mask
+        
     def select_layer(self, feats):
         if len(feats.shape)>3: 
             feats=feats.permute(1,2,0,3)
