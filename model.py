@@ -200,11 +200,11 @@ class TransformerModel(nn.Module):
         self.device = device
 
 
-    def forward(self, src):
+    def forward(self, src,src_key_padding_mask=None):
         src = src.permute(1,0,2)
         src = self.fc_embed(src)
         src = self.pos_encoder(src)    
-        output = self.transformer_encoder(src)
+        output = self.transformer_encoder(src,src_key_padding_mask=src_key_padding_mask)
         # mean pooling
         output = torch.mean(output,dim=0)
         params = self.out_params(output) 
