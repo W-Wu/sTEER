@@ -23,17 +23,19 @@ Two metrics proposed to evaluate emotion classification performance with automat
     `data_prep/iemo_trans_raw.py   # generate raw reference transcription from the dataset`  
     `data_prep/iemo_trans_organized.py # remove punctuation and special markers`  
 
-3. Prepare training, validation, testing scp file  
-    `data_prep/iemocap_prepare.py`  
-
-4. Prepare emotion label  
+3. Prepare emotion label  
     `data_prep/iemo_lab_AER-cat.py # 6-way emotion classification label`  
 
-5. Prepare VAD label  
+4. Prepare VAD label  
     - Label used for training: intra-utterance frame-level speech/non-speech    
     `data_prep/iemo_lab_VAD-utt.py`  
     - Label used for testing: speech segments according to word-level alignment (silence at the beginning, between words and at the end are removed)  
-    `data_prep/iemo_lab_VAD-seg.py`  
+    `data_prep/iemo_lab_VAD-seg.py`
+    - Convert speech segments to pyannote Annotation format  
+    `data_prep/iemo_lab_VAD-annote.py`
+
+5. Prepare training, validation, testing scp file  
+    `data_prep/iemocap_prepare.py`
 
 ## Training
 `Train.py Train.yaml --output_folder=exp`
