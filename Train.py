@@ -75,7 +75,10 @@ def dataio_prep(hparams,emo_lab_dic,vad_lab_dic):
         return sig
     
     datasets = {}
-    for dataset in ["train", "valid", "test","fwd_vad"]:
+    dataset_splits = ["train", "valid", "test"]
+    if hparams["FWD_VAD"]:
+        dataset_splits.append("fwd_vad")
+    for dataset in dataset_splits:
         if dataset == 'test':
             datasets[dataset] = sb.dataio.dataset.DynamicItemDataset.from_json(
                 json_path=hparams[f"{dataset}_annotation"],
@@ -108,11 +111,12 @@ def dataio_prep(hparams,emo_lab_dic,vad_lab_dic):
                 raise NotImplementedError(
                     "sorting must be random, ascending or descending"
                 )
-    datasets['fwd_drz'] = sb.dataio.dataset.DynamicItemDataset.from_json(
-                json_path=hparams["fwd_drz_annotation"],
-                dynamic_items=[fwd_drz_pipeline],
-                output_keys=["id", "sig"],
-            )
+    if hparams["FWD_DRZ"]:
+        datasets['fwd_drz'] = sb.dataio.dataset.DynamicItemDataset.from_json(
+                    json_path=hparams["fwd_drz_annotation"],
+                    dynamic_items=[fwd_drz_pipeline],
+                    output_keys=["id", "sig"],
+                )
 
     lab_enc_file_spk = os.path.join(hparams["save_folder"], "label_encoder_spk.txt")
     label_encoder_spk.load_or_create(
